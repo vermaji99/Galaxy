@@ -486,11 +486,13 @@ starInfoPanel.id = 'star-info-panel';
 starInfoPanel.className = 'hidden';
 document.body.appendChild(starInfoPanel);
 
-// Handle Star Clicks
-window.addEventListener('click', (e) => {
+// Handle Star Clicks with professional touch support
+function handleStarInteraction(clientX, clientY) {
+    if (window.isDragging) return; // Re-use isDragging from simulation.js
+
     const mouse = new THREE.Vector2(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
+        (clientX / window.innerWidth) * 2 - 1,
+        -(clientY / window.innerHeight) * 2 + 1
     );
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
@@ -510,6 +512,10 @@ window.addEventListener('click', (e) => {
             setTimeout(() => starInfoPanel.classList.add('hidden'), 5000);
         }
     }
+}
+
+window.addEventListener('pointerup', (e) => {
+    handleStarInteraction(e.clientX, e.clientY);
 });
 
 // --- Initialize Extensions ---

@@ -351,6 +351,8 @@ var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var infoPanel = document.getElementById('info-panel');
 var targetFocus = null;
+window.isDragging = false; // Make global for extensions.js
+var startPoint = { x: 0, y: 0 };
 
 var planetData = {
     mercury: { distance: '57.9M km', radius: '2,440 km', gravity: '3.7 m/s²', dayLength: '1407.6h', orbitalPeriod: '88d', surfaceTemp: '167°C', funFact: 'Smallest planet.' },
@@ -363,11 +365,22 @@ var planetData = {
     neptune: { distance: '4.5B km', radius: '24,622 km', gravity: '11.2 m/s²', dayLength: '16.1h', orbitalPeriod: '164.8y', surfaceTemp: '-214°C', funFact: 'Strongest winds.' }
 };
 
-window.addEventListener('click', function(e) {
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+// Handle both mouse and touch interaction professionally
+function handleInteraction(clientX, clientY, isMove = false) {
+    if (isMove) {
+        const dist = Math.sqrt(Math.pow(clientX - startPoint.x, 2) + Math.pow(clientY - startPoint.y, 2));
+        if (dist > 5) window.isDragging = true;
+        return;
+    }
+
+    if (window.isDragging) return;
+
+    mouse.x = (clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+    
     raycaster.setFromCamera(mouse, camera);
     var intersects = raycaster.intersectObjects(scene.children, true);
+    
     if (intersects.length > 0) {
         var obj = intersects[0].object;
         var p = planets.find(p => p.mesh === obj || p.mesh === obj.parent || (obj.parent && p.mesh === obj.parent.parent));
@@ -385,36 +398,59 @@ window.addEventListener('click', function(e) {
             infoPanel.classList.remove('hidden');
         }
     }
+}
+
+window.addEventListener('pointerdown', (e) => {
+    window.isDragging = false;
+    startPoint = { x: e.clientX, y: e.clientY };
 });
 
-document.getElementById('close-panel').onclick = function() { 
+window.addEventListener('pointermove', (e) => {
+    handleInteraction(e.clientX, e.clientY, true);
+});
+
+window.addEventListener('pointerup', (e) => {
+    handleInteraction(e.clientX, e.clientY);
+});
+
+document.getElementById('close-panel').addEventListener('pointerup', function(e) { 
+    e.stopPropagation();
     infoPanel.classList.add('hidden'); 
     targetFocus = null;
     gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 1.5, ease: "power2.inOut" });
-};
+});
 
 // --- 6. Post-Processing & Animation ---
 var composer = new THREE.EffectComposer(renderer);
 composer.addPass(new THREE.RenderPass(scene, camera));
-var bloom = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.0, 0.4, 0.85);
-bloom.threshold = 0.95; // Strictest threshold for stars only
-bloom.strength = 1.0; 
-bloom.radius = 0.5;
+var bloom = new THREE.UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight), 
+    1.0, 0.4, 0.85
+);
+// Optimize bloom for mobile performance
+const isMobile = window.innerWidth < 768;
+bloom.threshold = 0.95;
+bloom.strength = isMobile ? 0.6 : 1.0; 
+bloom.radius = isMobile ? 0.3 : 0.5;
 composer.addPass(bloom);
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 camera.position.set(0, 300, 600);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
+controls.rotateSpeed = 0.5; // Smoother rotation for touch
 controls.minDistance = 3.5; // Allow surface level zoom (Earth size is 3.0)
 controls.maxDistance = 1500;
 controls.update();
 
 window.addEventListener('resize', function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    composer.setSize(width, height);
 });
 
 function animate() {
