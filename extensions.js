@@ -1,184 +1,6 @@
 
-// --- Space Exploration Extensions ---
-
-// 1. Planet Moons System
-const moonData = {
-    'Earth': [
-        { name: 'Moon', size: 0.8, dist: 6, speed: 0.01, texture: '8k_moon.jpg' }
-    ],
-    'Mars': [
-        { name: 'Phobos', size: 0.2, dist: 3, speed: 0.02, color: 0x8b7d7b },
-        { name: 'Deimos', size: 0.15, dist: 4.5, speed: 0.015, color: 0xa9a9a9 }
-    ],
-    'Jupiter': [
-        { name: 'Io', size: 0.4, dist: 13, speed: 0.01, color: 0xffef00 },
-        { name: 'Europa', size: 0.38, dist: 15, speed: 0.008, color: 0xcccccc },
-        { name: 'Ganymede', size: 0.55, dist: 18, speed: 0.006, color: 0x999999 },
-        { name: 'Callisto', size: 0.52, dist: 22, speed: 0.004, color: 0x777777 }
-    ],
-    'Saturn': [
-        { name: 'Titan', size: 0.6, dist: 15, speed: 0.007, color: 0xffd700 },
-        { name: 'Enceladus', size: 0.25, dist: 11, speed: 0.012, color: 0xffffff },
-        { name: 'Rhea', size: 0.3, dist: 13, speed: 0.009, color: 0xdddddd }
-    ],
-    'Uranus': [
-        { name: 'Titania', size: 0.35, dist: 8, speed: 0.01, color: 0xcccccc },
-        { name: 'Oberon', size: 0.33, dist: 10, speed: 0.008, color: 0xbbbbbb }
-    ],
-    'Neptune': [
-        { name: 'Triton', size: 0.45, dist: 8, speed: 0.009, color: 0xeeeeee }
-    ]
-};
-
-var moonObjects = [];
-
-function createMoons() {
-    // Hide original Earth moon if it exists
-    if (typeof moonMesh !== 'undefined') {
-        moonMesh.visible = false;
-    }
-
-    planets.forEach(p => {
-        const moons = moonData[p.mesh.name];
-        if (moons) {
-            moons.forEach(m => {
-                // Moon Group for Orbit
-                const moonOrbitGroup = new THREE.Group();
-                p.mesh.add(moonOrbitGroup);
-
-                // Moon Mesh
-                const geometry = new THREE.SphereGeometry(m.size, 32, 32);
-                let material;
-                if (m.texture) {
-                    material = new THREE.MeshStandardMaterial({ roughness: 0.9 });
-                    loadTexture(material, 'map', m.texture);
-                } else {
-                    material = new THREE.MeshStandardMaterial({ color: m.color, roughness: 0.8 });
-                }
-                const mesh = new THREE.Mesh(geometry, material);
-                mesh.position.x = m.dist;
-                mesh.name = m.name;
-                moonOrbitGroup.add(mesh);
-
-                // Moon Orbit Path (Subtle)
-                const orbitGeom = new THREE.TorusGeometry(m.dist, 0.01, 8, 128);
-                const orbitMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1 });
-                const orbit = new THREE.Mesh(orbitGeom, orbitMat);
-                orbit.rotation.x = Math.PI / 2;
-                moonOrbitGroup.add(orbit);
-
-                moonObjects.push({
-                    mesh: mesh,
-                    orbitGroup: moonOrbitGroup,
-                    speed: m.speed,
-                    rotSpeed: 0.01 + Math.random() * 0.02
-                });
-            });
-        }
-    });
-}
-
-// 2. Asteroid Belt (Optimized with InstancedMesh)
-let instancedAsteroids;
-let asteroidCount = 8000;
-let asteroidData = [];
-
-function createAsteroidBelt() {
-    asteroidData = [];
-    // Hide original asteroid belt if it exists
-    if (typeof asteroidBelt !== 'undefined') {
-        asteroidBelt.visible = false;
-    }
-
-    const geometry = new THREE.IcosahedronGeometry(0.15, 0);
-    const material = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.9 });
-    instancedAsteroids = new THREE.InstancedMesh(geometry, material, asteroidCount);
-
-    const dummy = new THREE.Object3D();
-    for (let i = 0; i < asteroidCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = 145 + Math.random() * 35; // Between Mars (125) and Jupiter (190)
-        const x = Math.cos(angle) * dist;
-        const y = (Math.random() - 0.5) * 5;
-        const z = Math.sin(angle) * dist;
-
-        dummy.position.set(x, y, z);
-        dummy.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-        const scale = 0.5 + Math.random() * 1.5;
-        dummy.scale.set(scale, scale, scale);
-        dummy.updateMatrix();
-        instancedAsteroids.setMatrixAt(i, dummy.matrix);
-
-        asteroidData.push({
-            angle: angle,
-            dist: dist,
-            speed: 0.0001 + Math.random() * 0.0002,
-            y: y,
-            rotX: Math.random() * 0.01,
-            rotY: Math.random() * 0.01,
-            rotZ: Math.random() * 0.01
-        });
-    }
-    scene.add(instancedAsteroids);
-}
-
-// 3. Meteoroids / Comets
-const comets = [];
-function createComets() {
-    setInterval(() => {
-        if (comets.length < 5) {
-            spawnComet();
-        }
-    }, 5000);
-}
-
-function spawnComet() {
-    const cometGroup = new THREE.Group();
-    
-    // Comet Head
-    const headGeom = new THREE.SphereGeometry(0.5, 8, 8);
-    const headMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-    const head = new THREE.Mesh(headGeom, headMat);
-    cometGroup.add(head);
-
-    // Comet Tail (Sprite or Particles)
-    const tailCanvas = document.createElement('canvas');
-    tailCanvas.width = 64; tailCanvas.height = 64;
-    const ctx = tailCanvas.getContext('2d');
-    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
-    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 64, 64);
-
-    const tailMat = new THREE.SpriteMaterial({ 
-        map: new THREE.CanvasTexture(tailCanvas),
-        blending: THREE.AdditiveBlending,
-        transparent: true
-    });
-    
-    for(let i=0; i<15; i++) {
-        const sprite = new THREE.Sprite(tailMat);
-        sprite.scale.set(1, 1, 1);
-        sprite.position.x = -i * 0.8;
-        sprite.scale.multiplyScalar(1 - i/15);
-        cometGroup.add(sprite);
-    }
-
-    // Random start and direction
-    const startAngle = Math.random() * Math.PI * 2;
-    const startDist = 500;
-    cometGroup.position.set(Math.cos(startAngle) * startDist, (Math.random()-0.5)*100, Math.sin(startAngle) * startDist);
-    
-    const target = new THREE.Vector3(0, 0, 0);
-    const direction = target.clone().sub(cometGroup.position).normalize();
-    
-    scene.add(cometGroup);
-    comets.push({ group: cometGroup, direction: direction, speed: 1.5 + Math.random() * 2 });
-}
-
-// 4. Deep Space Star Field & 5. Major Stars Information
-let deepStars;
+// --- 4. Deep Space Star Field & 5. Major Stars Information
+let deepStars, nebulaClouds;
 const majorStarsData = [
     { name: 'Sirius', pos: [1000, 200, -800], dist: '8.6 ly', type: 'A1V', size: '1.7x Sun' },
     { name: 'Betelgeuse', pos: [-1200, 400, 500], dist: '642 ly', type: 'M1-2', size: '887x Sun' },
@@ -195,7 +17,7 @@ const majorStarsData = [
     { name: 'Alkaid (Saptrishi)', pos: [-380, 1100, -100], dist: '101 ly', type: 'B3V', size: '3.4x Sun' }
 ];
 
-function createStarField() {
+function createDeepSpaceStars() {
     // Hide original starfield if it exists
     scene.children.forEach(c => {
         if (c instanceof THREE.Points && c.geometry.attributes.position.count === 20000) {
@@ -204,25 +26,26 @@ function createStarField() {
     });
     
     const starGeom = new THREE.BufferGeometry();
-    const starCount = 15000;
+    const starCount = 30000; // Increased for "massive" feel
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
     const sizes = new Float32Array(starCount);
 
     for (let i = 0; i < starCount; i++) {
-        const x = (Math.random() - 0.5) * 5000;
-        const y = (Math.random() - 0.5) * 5000;
-        const z = (Math.random() - 0.5) * 5000;
-        positions[i * 3] = x;
-        positions[i * 3 + 1] = y;
-        positions[i * 3 + 2] = z;
+        const dist = 1000 + Math.random() * 4000;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos((Math.random() * 2) - 1);
+        
+        positions[i * 3] = dist * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = dist * Math.sin(phi) * Math.sin(theta);
+        positions[i * 3 + 2] = dist * Math.cos(phi);
 
-        const brightness = 0.5 + Math.random() * 0.5;
+        const brightness = 0.4 + Math.random() * 0.6;
         colors[i * 3] = brightness;
-        colors[i * 3 + 1] = brightness;
-        colors[i * 3 + 2] = brightness;
+        colors[i * 3 + 1] = brightness + 0.1; // Slight blue tint
+        colors[i * 3 + 2] = brightness + 0.2;
 
-        sizes[i] = Math.random() * 1.5;
+        sizes[i] = 0.5 + Math.random() * 2.0;
     }
 
     starGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -230,24 +53,44 @@ function createStarField() {
     starGeom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
     const starMat = new THREE.PointsMaterial({
-        size: 1,
+        size: 1.5,
         vertexColors: true,
         transparent: true,
         opacity: 0.8,
-        sizeAttenuation: true
+        sizeAttenuation: true,
+        blending: THREE.AdditiveBlending
     });
 
     deepStars = new THREE.Points(starGeom, starMat);
     scene.add(deepStars);
 
-    // Create Major Stars as clickable sprites
+    // Create Nebula Clouds
+    nebulaClouds = new THREE.Group();
+    scene.add(nebulaClouds);
+    
+    const nebulaTex = new THREE.TextureLoader().load('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Dust_Clouds_of_the_Orion_Nebula.jpg/640px-Dust_Clouds_of_the_Orion_Nebula.jpg');
+    for(let i=0; i<8; i++) {
+        const mat = new THREE.SpriteMaterial({ 
+            map: nebulaTex, 
+            transparent: true, 
+            opacity: 0.05, 
+            blending: THREE.AdditiveBlending,
+            color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5)
+        });
+        const sprite = new THREE.Sprite(mat);
+        const dist = 3000;
+        sprite.position.set((Math.random()-0.5)*dist, (Math.random()-0.5)*dist, (Math.random()-0.5)*dist);
+        sprite.scale.set(2000, 2000, 1);
+        nebulaClouds.add(sprite);
+    }
+
+    // Create Major Stars
     majorStarsData.forEach(s => {
         const canvas = document.createElement('canvas');
         canvas.width = 64; canvas.height = 64;
         const ctx = canvas.getContext('2d');
         const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
         
-        // Make Saptrishi stars glow slightly differently (golden)
         if (s.name.includes('Saptrishi')) {
             grad.addColorStop(0, 'rgba(255, 255, 200, 1)');
             grad.addColorStop(0.3, 'rgba(255, 200, 50, 0.8)');
@@ -267,56 +110,65 @@ function createStarField() {
         scene.add(sprite);
     });
 
-    // Draw Constellation Lines for Saptrishi
+    // Saptrishi Constellation Lines
     const saptrishiStars = majorStarsData.filter(s => s.name.includes('Saptrishi'));
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
-    
-    // Connect Merak to Duhbe
     const connect = (s1, s2) => {
         const points = [new THREE.Vector3(...s1.pos), new THREE.Vector3(...s2.pos)];
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const line = new THREE.Line(geometry, lineMaterial);
         scene.add(line);
     };
-
-    // Merak to Duhbe (Pointers to Polaris)
     connect(saptrishiStars[1], saptrishiStars[0]);
-    // Merak to Phecda
     connect(saptrishiStars[1], saptrishiStars[2]);
-    // Phecda to Megrez
     connect(saptrishiStars[2], saptrishiStars[3]);
-    // Megrez to Alioth
     connect(saptrishiStars[3], saptrishiStars[4]);
-    // Alioth to Mizar
     connect(saptrishiStars[4], saptrishiStars[5]);
-    // Mizar to Alkaid
     connect(saptrishiStars[5], saptrishiStars[6]);
-    // Megrez to Duhbe (closes the bowl)
     connect(saptrishiStars[3], saptrishiStars[0]);
 }
 
-// 6. Galaxy Layer
-let galaxyLayer;
-function createGalaxies() {
-    galaxyLayer = new THREE.Group();
-    scene.add(galaxyLayer);
+// 6. Milky Way & Distant Galaxies
+let milkyWay, distantGalaxiesGroup;
 
-    // Use real galaxy textures
+function createMilkyWayGalaxy() {
+    const texLoader = new THREE.TextureLoader();
+    const milkyWayTex = texLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/ESO-VLT-Laser-Phot-28a-07.jpg/640px-ESO-VLT-Laser-Phot-28a-07.jpg');
+    
+    const geometry = new THREE.PlaneGeometry(3000, 3000);
+    const material = new THREE.MeshBasicMaterial({
+        map: milkyWayTex,
+        transparent: true,
+        opacity: 0.4,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        depthWrite: false
+    });
+    
+    milkyWay = new THREE.Mesh(geometry, material);
+    milkyWay.position.set(0, -500, -1000);
+    milkyWay.rotation.x = Math.PI / 2.5;
+    scene.add(milkyWay);
+}
+
+function createDistantGalaxies() {
+    distantGalaxiesGroup = new THREE.Group();
+    scene.add(distantGalaxiesGroup);
+
     const textureLoader = new THREE.TextureLoader();
     textureLoader.crossOrigin = 'anonymous';
 
     const galaxyTextures = [
-        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/M31_spiral_galaxy.jpg/640px-M31_spiral_galaxy.jpg'),
-        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/M51_HST_ACS_WFC3.jpg/640px-M51_HST_ACS_WFC3.jpg'),
-        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/M81_HST.jpg/640px-M81_HST.jpg')
+        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/M31_spiral_galaxy.jpg/640px-M31_spiral_galaxy.jpg'), // Andromeda
+        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/M51_HST_ACS_WFC3.jpg/640px-M51_HST_ACS_WFC3.jpg'), // Whirlpool
+        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Sombrero_Galaxy.jpg/640px-Sombrero_Galaxy.jpg'), // Sombrero
+        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/M81_HST.jpg/640px-M81_HST.jpg'), // Bode's
+        textureLoader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/M33_HST_full.jpg/640px-M33_HST_full.jpg') // Triangulum
     ];
 
-    // Create many galaxies
-    const galaxyCount = 60;
-    for(let i=0; i<galaxyCount; i++) {
-        const baseOpacity = 0.4 + Math.random() * 0.4;
+    for(let i=0; i<60; i++) {
+        const baseOpacity = 0.3 + Math.random() * 0.4;
         const texIndex = Math.floor(Math.random() * galaxyTextures.length);
-        
         const mat = new THREE.SpriteMaterial({ 
             map: galaxyTextures[texIndex], 
             blending: THREE.AdditiveBlending,
@@ -327,57 +179,55 @@ function createGalaxies() {
         
         const sprite = new THREE.Sprite(mat);
         sprite.userData = { baseOpacity: baseOpacity };
-        
-        // Random position far away
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.acos((Math.random() * 2) - 1);
-        const dist = 2500 + Math.random() * 2000;
+        const dist = 3000 + Math.random() * 2000;
         
-        sprite.position.set(
-            dist * Math.sin(phi) * Math.cos(theta),
-            dist * Math.sin(phi) * Math.sin(theta),
-            dist * Math.cos(phi)
-        );
-        
-        // Random size
+        sprite.position.set(dist * Math.sin(phi) * Math.cos(theta), dist * Math.sin(phi) * Math.sin(theta), dist * Math.cos(phi));
         const size = 600 + Math.random() * 800;
         sprite.scale.set(size, size, 1);
-        
-        // Random rotation (simulated by color variation as sprites always face camera)
         sprite.material.color.setHSL(Math.random(), 0.2, 0.9);
-        
-        galaxyLayer.add(sprite);
+        distantGalaxiesGroup.add(sprite);
+    }
+}
+
+function updateDeepSpaceVisibility(cameraDistance) {
+    // Level 1-2: Close View (cameraDistance < 800)
+    // Level 3: Far Zoom (cameraDistance 800 - 1500)
+    // Level 4: Extreme Zoom (cameraDistance > 1500)
+
+    if (milkyWay) {
+        milkyWay.visible = cameraDistance > 600;
+        milkyWay.material.opacity = Math.min((cameraDistance - 600) / 1000, 0.4);
+        milkyWay.rotation.z += 0.0001; // Subtle rotation
+    }
+
+    if (distantGalaxiesGroup) {
+        distantGalaxiesGroup.visible = cameraDistance > 1200;
+        const groupOpacity = Math.min((cameraDistance - 1200) / 1000, 1);
+        distantGalaxiesGroup.children.forEach(child => {
+            child.material.opacity = groupOpacity * (child.userData.baseOpacity || 0.8);
+        });
+    }
+
+    if (deepStars) {
+        deepStars.visible = cameraDistance > 400;
+        deepStars.material.opacity = Math.min((cameraDistance - 400) / 800, 0.8);
     }
     
-    // Add a few named "Hero" galaxies with specific positions
-    const heroGalaxies = [
-        { name: 'Andromeda', pos: [2000, 1000, -2000], size: 1500, tex: 0 },
-        { name: 'Whirlpool', pos: [-2500, -1500, 1000], size: 1200, tex: 1 },
-        { name: 'Bode\'s Galaxy', pos: [0, 2500, -2500], size: 1300, tex: 2 }
-    ];
-    
-    heroGalaxies.forEach(g => {
-        const baseOpacity = 0.9;
-        const mat = new THREE.SpriteMaterial({ 
-            map: galaxyTextures[g.tex], 
-            blending: THREE.AdditiveBlending,
-            transparent: true,
-            opacity: baseOpacity,
-            depthWrite: false
+    if (nebulaClouds) {
+        nebulaClouds.visible = cameraDistance > 1500;
+        nebulaClouds.children.forEach(c => {
+            c.material.opacity = Math.min((cameraDistance - 1500) / 2000, 0.05);
         });
-        const sprite = new THREE.Sprite(mat);
-        sprite.userData = { baseOpacity: baseOpacity };
-        sprite.position.set(...g.pos);
-        sprite.scale.set(g.size, g.size, 1);
-        galaxyLayer.add(sprite);
-    });
+    }
 }
 
 // 7. Cinematic Zoom Out Mode
 function enableDeepSpaceZoom() {
-    controls.maxDistance = 5000;
+    controls.maxDistance = 6000; // Increased max distance for extreme zoom
     
-    // Add Cinematic Zoom Button
+    // UI Buttons (Responsive Classes used from style.css)
     const zoomBtn = document.createElement('button');
     zoomBtn.id = 'cinematic-zoom-btn';
     zoomBtn.className = 'control-btn';
@@ -387,14 +237,13 @@ function enableDeepSpaceZoom() {
 
     zoomBtn.onclick = () => {
         gsap.to(camera.position, {
-            x: 2000, y: 1500, z: 3000,
-            duration: 4,
+            x: 2500, y: 1800, z: 3500,
+            duration: 5,
             ease: "power2.inOut",
             onUpdate: () => controls.update()
         });
     };
 
-    // Add Find Saptrishi Button
     const saptrishiBtn = document.createElement('button');
     saptrishiBtn.id = 'find-saptrishi-btn';
     saptrishiBtn.className = 'control-btn btn-golden';
@@ -413,28 +262,12 @@ function enableDeepSpaceZoom() {
             }
         });
     };
-
-    // Listen for zoom changes to show/hide layers
-    // Moved to updateExtensions() for smoother updates
 }
 
 // Update loop for extensions
 function updateExtensions() {
-    // Galaxy Visibility Logic
-    if (typeof galaxyLayer !== 'undefined' && galaxyLayer) {
-        const dist = camera.position.length();
-        // Make galaxies visible sooner and fade them in
-        if (dist > 800) {
-            galaxyLayer.visible = true;
-            // Simple opacity fade based on distance
-            const opacity = Math.min((dist - 800) / 1000, 1);
-            galaxyLayer.children.forEach(child => {
-                child.material.opacity = opacity * (child.userData.baseOpacity || 0.8);
-            });
-        } else {
-            galaxyLayer.visible = false;
-        }
-    }
+    const cameraDist = camera.position.length();
+    updateDeepSpaceVisibility(cameraDist);
 
     // Moons
     moonObjects.forEach(m => {
@@ -450,7 +283,6 @@ function updateExtensions() {
             data.angle += data.speed;
             const x = Math.cos(data.angle) * data.dist;
             const z = Math.sin(data.angle) * data.dist;
-            
             dummy.position.set(x, data.y, z);
             dummy.rotation.set(data.angle, data.angle * 0.5, 0);
             dummy.scale.setScalar(1);
@@ -464,7 +296,7 @@ function updateExtensions() {
     for (let i = comets.length - 1; i >= 0; i--) {
         const c = comets[i];
         c.group.position.add(c.direction.clone().multiplyScalar(c.speed));
-        if (c.group.position.length() > 2000) {
+        if (c.group.position.length() > 3000) {
             scene.remove(c.group);
             comets.splice(i, 1);
         }
@@ -486,42 +318,30 @@ starInfoPanel.id = 'star-info-panel';
 starInfoPanel.className = 'hidden';
 document.body.appendChild(starInfoPanel);
 
-// Handle Star Clicks with professional touch support
 function handleStarInteraction(clientX, clientY) {
-    if (window.isDragging) return; // Re-use isDragging from simulation.js
-
-    const mouse = new THREE.Vector2(
-        (clientX / window.innerWidth) * 2 - 1,
-        -(clientY / window.innerHeight) * 2 + 1
-    );
+    if (window.isDragging) return;
+    const mouse = new THREE.Vector2((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
-    
     if (intersects.length > 0) {
         const obj = intersects[0].object;
         if (obj.userData && obj.userData.isStar) {
             const info = obj.userData.info;
-            starInfoPanel.innerHTML = `
-                <h3 style="margin-top:0">${info.name}</h3>
-                <p>Distance: ${info.dist}</p>
-                <p>Type: ${info.type}</p>
-                <p>Size: ${info.size}</p>
-            `;
+            starInfoPanel.innerHTML = `<h3>${info.name}</h3><p>Dist: ${info.dist}</p><p>Type: ${info.type}</p><p>Size: ${info.size}</p>`;
             starInfoPanel.classList.remove('hidden');
             setTimeout(() => starInfoPanel.classList.add('hidden'), 5000);
         }
     }
 }
 
-window.addEventListener('pointerup', (e) => {
-    handleStarInteraction(e.clientX, e.clientY);
-});
+window.addEventListener('pointerup', (e) => handleStarInteraction(e.clientX, e.clientY));
 
 // --- Initialize Extensions ---
 createMoons();
 createAsteroidBelt();
-createStarField();
-createGalaxies();
+createDeepSpaceStars();
+createMilkyWayGalaxy();
+createDistantGalaxies();
 createComets();
 enableDeepSpaceZoom();
