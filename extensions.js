@@ -225,7 +225,7 @@ function updateDeepSpaceVisibility(cameraDistance) {
 
 // 7. Cinematic Zoom Out Mode
 function enableDeepSpaceZoom() {
-    controls.maxDistance = 6000; // Increased max distance for extreme zoom
+    controls.maxDistance = 15000; // Match the high-scale limit for extreme deep space zoom
     
     // UI Buttons (Responsive Classes used from style.css)
     const zoomBtn = document.createElement('button');

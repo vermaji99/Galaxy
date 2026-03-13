@@ -1,10 +1,11 @@
 // --- 1. Scene Setup ---
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20000); // Increased far plane to 20000 for deep space
 var renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('.webgl'),
     antialias: true,
-    powerPreference: "high-performance"
+    powerPreference: "high-performance",
+    logarithmicDepthBuffer: true // Enable logarithmicDepthBuffer for better depth at extreme distances
 });
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -438,9 +439,10 @@ var controls = new THREE.OrbitControls(camera, renderer.domElement);
 camera.position.set(0, 300, 600);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.rotateSpeed = 0.5; // Smoother rotation for touch
-controls.minDistance = 3.5; // Allow surface level zoom (Earth size is 3.0)
-controls.maxDistance = 1500;
+controls.rotateSpeed = 0.5; 
+controls.enableZoom = true; // Explicitly enable zoom
+controls.minDistance = 3.5; 
+controls.maxDistance = 15000; // Increased to 15000 to match deep space scale
 controls.update();
 
 window.addEventListener('resize', function() {
@@ -489,13 +491,7 @@ function animate() {
 }
 
 // --- 7. Space Exploration Extensions ---
-if (typeof createMoons === 'function') {
-    createMoons();
-    createAsteroidBelt();
-    createStarField();
-    createGalaxies();
-    createComets();
-    enableDeepSpaceZoom();
-}
+// The extensions initialize themselves when extensions.js is loaded.
+// We just need to ensure the update loop is hooked into animate().
 
 animate();
