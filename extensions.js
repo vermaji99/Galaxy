@@ -380,35 +380,9 @@ function enableDeepSpaceZoom() {
     // Add Cinematic Zoom Button
     const zoomBtn = document.createElement('button');
     zoomBtn.id = 'cinematic-zoom-btn';
+    zoomBtn.className = 'control-btn';
     zoomBtn.innerHTML = '🔭 Explore Deep Space';
-    zoomBtn.style.cssText = `
-        position: absolute;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 20, 40, 0.8);
-        color: #00ffff;
-        padding: 12px 24px;
-        border: 1px solid #00ffff;
-        border-radius: 30px;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 16px;
-        cursor: pointer;
-        z-index: 100;
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-        transition: all 0.3s ease;
-    `;
-    
-    zoomBtn.onmouseover = () => {
-        zoomBtn.style.background = 'rgba(0, 255, 255, 0.2)';
-        zoomBtn.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.6)';
-    };
-    
-    zoomBtn.onmouseout = () => {
-        zoomBtn.style.background = 'rgba(0, 20, 40, 0.8)';
-        zoomBtn.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)';
-    };
-    
+    zoomBtn.style.bottom = '30px';
     document.body.appendChild(zoomBtn);
 
     zoomBtn.onclick = () => {
@@ -423,35 +397,9 @@ function enableDeepSpaceZoom() {
     // Add Find Saptrishi Button
     const saptrishiBtn = document.createElement('button');
     saptrishiBtn.id = 'find-saptrishi-btn';
+    saptrishiBtn.className = 'control-btn btn-golden';
     saptrishiBtn.innerHTML = '✨ Locate Saptrishi';
-    saptrishiBtn.style.cssText = `
-        position: absolute;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(60, 40, 0, 0.8);
-        color: #ffcc00;
-        padding: 10px 20px;
-        border: 1px solid #ffcc00;
-        border-radius: 30px;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 14px;
-        cursor: pointer;
-        z-index: 100;
-        box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
-        transition: all 0.3s ease;
-    `;
-    
-    saptrishiBtn.onmouseover = () => {
-        saptrishiBtn.style.background = 'rgba(255, 204, 0, 0.2)';
-        saptrishiBtn.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.6)';
-    };
-    
-    saptrishiBtn.onmouseout = () => {
-        saptrishiBtn.style.background = 'rgba(60, 40, 0, 0.8)';
-        saptrishiBtn.style.boxShadow = '0 0 10px rgba(255, 204, 0, 0.3)';
-    };
-    
+    saptrishiBtn.style.bottom = '80px';
     document.body.appendChild(saptrishiBtn);
 
     saptrishiBtn.onclick = () => {
@@ -536,18 +484,6 @@ function updateExtensions() {
 const starInfoPanel = document.createElement('div');
 starInfoPanel.id = 'star-info-panel';
 starInfoPanel.className = 'hidden';
-starInfoPanel.style.cssText = `
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 10, 0.8);
-    color: #00ffff;
-    padding: 15px;
-    border: 1px solid #00ffff;
-    border-radius: 8px;
-    font-family: 'Orbitron', sans-serif;
-    pointer-events: none;
-`;
 document.body.appendChild(starInfoPanel);
 
 // Handle Star Clicks

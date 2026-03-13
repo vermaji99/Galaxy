@@ -126,14 +126,91 @@ body {
     color: #ccc;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     #info-panel {
         width: calc(100% - 40px);
         bottom: 20px;
         top: auto;
+        right: 20px;
+        left: 20px;
+        padding: 15px;
     }
     
+    #info-panel.hidden {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
     #title {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
+    }
+
+    #hint {
+        font-size: 0.7rem;
+    }
+
+    .control-btn {
+        padding: 8px 16px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* Professional Buttons */
+.control-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 20, 40, 0.8);
+    color: #00ffff;
+    padding: 12px 24px;
+    border: 1px solid #00ffff;
+    border-radius: 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.control-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+}
+
+.btn-golden {
+    background: rgba(60, 40, 0, 0.8);
+    color: #ffcc00;
+    border-color: #ffcc00;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+}
+
+.btn-golden:hover {
+    background: rgba(255, 204, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+}
+
+#star-info-panel {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 10, 0.8);
+    color: #00ffff;
+    padding: 15px;
+    border: 1px solid #00ffff;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+    pointer-events: none;
+    z-index: 100;
+    max-width: 250px;
+}
+
+@media (max-width: 768px) {
+    #star-info-panel {
+        bottom: 150px;
+        right: 20px;
+        left: 20px;
+        max-width: none;
     }
 }
