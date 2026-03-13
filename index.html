@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar System Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas class="webgl"></canvas>
+    
+    <div id="ui-container">
+        <h1 id="title">Solar System Explorer</h1>
+        <p id="hint">Click on a planet to view its details</p>
+    </div>
+
+    <div id="info-panel" class="hidden">
+        <button id="close-panel">&times;</button>
+        <div class="panel-header">
+            <h2 id="planet-name"></h2>
+        </div>
+        <div class="panel-content">
+            <div class="info-item">
+                <span class="label">Distance:</span>
+                <span id="distance" class="value"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Radius:</span>
+                <span id="radius" class="value"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Gravity:</span>
+                <span id="gravity" class="value"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Day Length:</span>
+                <span id="day-length" class="value"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Orbit:</span>
+                <span id="orbital-period" class="value"></span>
+            </div>
+            <div class="info-item">
+                <span class="label">Temp:</span>
+                <span id="surface-temp" class="value"></span>
+            </div>
+            <div class="fact-container">
+                <span class="label">Fun Fact:</span>
+                <p id="fun-fact"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Controls and Post-processing -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    
+    <!-- Shaders -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    
+    <!-- Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <!-- Main Script -->
+    <script src="simulation.js"></script>
+    <script src="extensions.js"></script>
+</body>
+</html>
