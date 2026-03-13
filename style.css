@@ -127,45 +127,6 @@ body {
     color: #ccc;
 }
 
-@media (max-width: 768px) {
-    #info-panel {
-        width: calc(100% - 40px);
-        bottom: 10px;
-        top: auto;
-        right: 20px;
-        left: 20px;
-        padding: 15px;
-    }
-    
-    #info-panel.hidden {
-        transform: translateY(120%);
-        opacity: 0;
-    }
-
-    #title {
-        font-size: 1.1rem;
-    }
-
-    #hint {
-        font-size: 0.65rem;
-    }
-
-    .control-btn {
-        padding: 10px 20px !important;
-        font-size: 11px !important;
-        width: 80% !important;
-        max-width: 280px;
-    }
-    
-    #cinematic-zoom-btn {
-        bottom: 20px !important;
-    }
-    
-    #find-saptrishi-btn {
-        bottom: 80px !important; /* Increased spacing */
-    }
-}
-
 /* Professional Buttons */
 .control-btn {
     position: absolute;
@@ -218,10 +179,98 @@ body {
 }
 
 @media (max-width: 768px) {
+    #info-panel {
+        width: 180px; /* Small, fixed width */
+        bottom: 15px;
+        left: 15px; /* Bottom-left corner */
+        top: auto;
+        right: auto;
+        padding: 12px;
+        max-height: 40vh;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.85); /* Slightly darker for contrast */
+    }
+    
+    #info-panel.hidden {
+        transform: translateX(-120%); /* Slide out to the left */
+        opacity: 0;
+    }
+
+    .panel-header h2 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+    }
+
+    .info-item {
+        margin-bottom: 6px;
+        font-size: 0.75rem;
+    }
+
+    .label {
+        font-size: 0.6rem;
+    }
+
+    .fact-container {
+        margin-top: 10px;
+        padding-top: 8px;
+    }
+
+    #fun-fact {
+        font-size: 0.7rem;
+    }
+
+    #title {
+        font-size: 0.9rem;
+        width: auto;
+        left: 15px;
+        top: 15px;
+    }
+
+    #hint {
+        font-size: 0.6rem;
+    }
+
+    .control-btn {
+        position: absolute;
+        right: 15px !important;
+        left: auto !important;
+        transform: none !important;
+        width: auto !important;
+        min-width: 120px;
+        padding: 6px 10px !important;
+        font-size: 9px !important;
+        border-radius: 15px;
+    }
+    
+    #cinematic-zoom-btn {
+        top: 15px !important;
+        bottom: auto !important;
+    }
+    
+    #find-saptrishi-btn {
+        top: 55px !important;
+        bottom: auto !important;
+    }
+
     #star-info-panel {
-        bottom: 150px;
-        right: 20px;
-        left: 20px;
+        bottom: 15px;
+        right: 15px;
+        left: auto;
+        width: 160px;
         max-width: none;
+        padding: 10px;
+        font-size: 0.7rem;
+    }
+    
+    #star-info-panel h3 {
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+    
+    #star-info-panel p {
+        margin: 3px 0;
     }
 }

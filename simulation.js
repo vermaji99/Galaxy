@@ -478,7 +478,9 @@ function animate() {
     if (targetFocus) {
         var worldPos = new THREE.Vector3();
         targetFocus.getWorldPosition(worldPos);
-        controls.target.lerp(worldPos, 0.05); // Smoother camera tracking
+        
+        // On mobile, keep the planet centered as the info panel is now in a corner
+        controls.target.lerp(worldPos, 0.05); 
     }
     
     controls.update();
