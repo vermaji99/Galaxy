@@ -394,6 +394,56 @@ function enableDeepSpaceZoom() {
         });
     };
 
+    // Add Reset Button
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'reset-view-btn';
+    resetBtn.className = 'control-btn';
+    resetBtn.innerHTML = '☀️ Reset to Sun';
+    resetBtn.style.cssText = `
+        position: absolute;
+        bottom: 30px;
+        left: 20px;
+        background: rgba(255, 100, 0, 0.2);
+        color: #ffaa00;
+        border: 1px solid #ffaa00;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 14px;
+        cursor: pointer;
+        z-index: 100;
+        transition: all 0.3s ease;
+    `;
+    resetBtn.onmouseover = () => resetBtn.style.background = 'rgba(255, 100, 0, 0.4)';
+    resetBtn.onmouseout = () => resetBtn.style.background = 'rgba(255, 100, 0, 0.2)';
+    document.body.appendChild(resetBtn);
+
+    resetBtn.onclick = () => {
+        // Clear planet focus
+        if (typeof targetFocus !== 'undefined') {
+            // Check if global variable or need to find it
+            // In simulation.js it's global, so we can set it
+            window.targetFocus = null; 
+        }
+        
+        // Hide info panels
+        if (typeof infoPanel !== 'undefined') infoPanel.classList.add('hidden');
+        starInfoPanel.classList.add('hidden');
+
+        // Reset camera and controls
+        gsap.to(camera.position, {
+            x: 0, y: 300, z: 600,
+            duration: 3,
+            ease: "power2.inOut"
+        });
+        gsap.to(controls.target, {
+            x: 0, y: 0, z: 0,
+            duration: 3,
+            ease: "power2.inOut",
+            onUpdate: () => controls.update()
+        });
+    };
+
     // --- Professional Star Catalog Dropdown (Right Side) ---
     const starMenuContainer = document.createElement('div');
     starMenuContainer.id = 'star-catalog-container';
