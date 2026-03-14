@@ -127,11 +127,9 @@ body {
     color: #ccc;
 }
 
-/* Professional Buttons */
+/* Professional Buttons Base */
 .control-btn {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    position: fixed;
     background: rgba(0, 20, 40, 0.8);
     color: #00ffff;
     padding: 12px 24px;
@@ -163,114 +161,77 @@ body {
     box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
 }
 
-#star-info-panel {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 10, 0.8);
-    color: #00ffff;
-    padding: 15px;
-    border: 1px solid #00ffff;
-    border-radius: 8px;
-    font-family: 'Orbitron', sans-serif;
-    pointer-events: none;
-    z-index: 100;
-    max-width: 250px;
+/* Specific Button Positions */
+#cinematic-zoom-btn {
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
+#reset-view-btn {
+    bottom: 30px;
+    left: 30px;
+    background: rgba(255, 100, 0, 0.2);
+    color: #ffaa00;
+    border: 1px solid #ffaa00;
+}
+
+#star-catalog-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#star-list {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 5px;
+    align-items: flex-end;
+}
+
+/* Mobile Responsiveness Overrides */
 @media (max-width: 768px) {
     #info-panel {
-        width: 180px; /* Small, fixed width */
-        bottom: 15px;
-        left: 15px; /* Bottom-left corner */
-        top: auto;
-        right: auto;
-        padding: 12px;
-        max-height: 40vh;
-        overflow-y: auto;
-        z-index: 1000;
-        border-radius: 10px;
-        background: rgba(0, 0, 0, 0.85); /* Slightly darker for contrast */
-    }
-    
-    #info-panel.hidden {
-        transform: translateX(-120%); /* Slide out to the left */
-        opacity: 0;
-    }
-
-    .panel-header h2 {
-        font-size: 1rem;
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-    }
-
-    .info-item {
-        margin-bottom: 6px;
-        font-size: 0.75rem;
-    }
-
-    .label {
-        font-size: 0.6rem;
-    }
-
-    .fact-container {
-        margin-top: 10px;
-        padding-top: 8px;
-    }
-
-    #fun-fact {
-        font-size: 0.7rem;
-    }
-
-    #title {
-        font-size: 0.9rem;
-        width: auto;
+        width: 160px;
+        bottom: 80px; /* Moved up to make room for reset button */
         left: 15px;
-        top: 15px;
-    }
-
-    #hint {
-        font-size: 0.6rem;
+        padding: 10px;
     }
 
     .control-btn {
-        position: absolute;
-        right: 15px !important;
-        left: auto !important;
-        transform: none !important;
-        width: auto !important;
-        min-width: 120px;
-        padding: 6px 10px !important;
-        font-size: 9px !important;
-        border-radius: 15px;
-    }
-    
-    #cinematic-zoom-btn {
-        top: 15px !important;
-        bottom: auto !important;
-    }
-    
-    #find-saptrishi-btn {
-        top: 55px !important;
-        bottom: auto !important;
+        padding: 8px 16px;
+        font-size: 11px;
+        min-width: auto;
     }
 
-    #star-info-panel {
-        bottom: 15px;
-        right: 15px;
+    #cinematic-zoom-btn {
+        bottom: 20px;
         left: auto;
-        width: 160px;
-        max-width: none;
-        padding: 10px;
-        font-size: 0.7rem;
+        right: 20px;
+        transform: none;
     }
-    
-    #star-info-panel h3 {
-        font-size: 0.8rem;
-        margin-bottom: 5px;
+
+    #reset-view-btn {
+        bottom: 20px;
+        left: 20px;
     }
-    
-    #star-info-panel p {
-        margin: 3px 0;
+
+    #star-catalog-container {
+        top: 15px;
+        right: 15px;
+    }
+
+    #title {
+        font-size: 0.85rem;
+        top: 15px;
+        left: 15px;
     }
 }

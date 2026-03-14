@@ -377,12 +377,11 @@ function createGalaxies() {
 function enableDeepSpaceZoom() {
     controls.maxDistance = 15000; // Match the high-scale limit for extreme deep space zoom
     
-    // UI Buttons (Responsive Classes used from style.css)
+    // Add Cinematic Zoom Button
     const zoomBtn = document.createElement('button');
     zoomBtn.id = 'cinematic-zoom-btn';
     zoomBtn.className = 'control-btn';
     zoomBtn.innerHTML = '🔭 Explore Deep Space';
-    zoomBtn.style.bottom = '30px';
     document.body.appendChild(zoomBtn);
 
     zoomBtn.onclick = () => {
@@ -399,38 +398,13 @@ function enableDeepSpaceZoom() {
     resetBtn.id = 'reset-view-btn';
     resetBtn.className = 'control-btn';
     resetBtn.innerHTML = '☀️ Reset to Sun';
-    resetBtn.style.cssText = `
-        position: absolute;
-        bottom: 30px;
-        left: 20px;
-        background: rgba(255, 100, 0, 0.2);
-        color: #ffaa00;
-        border: 1px solid #ffaa00;
-        padding: 10px 20px;
-        border-radius: 30px;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 14px;
-        cursor: pointer;
-        z-index: 100;
-        transition: all 0.3s ease;
-    `;
-    resetBtn.onmouseover = () => resetBtn.style.background = 'rgba(255, 100, 0, 0.4)';
-    resetBtn.onmouseout = () => resetBtn.style.background = 'rgba(255, 100, 0, 0.2)';
     document.body.appendChild(resetBtn);
 
     resetBtn.onclick = () => {
-        // Clear planet focus
-        if (typeof targetFocus !== 'undefined') {
-            // Check if global variable or need to find it
-            // In simulation.js it's global, so we can set it
-            window.targetFocus = null; 
-        }
-        
-        // Hide info panels
+        window.targetFocus = null; 
         if (typeof infoPanel !== 'undefined') infoPanel.classList.add('hidden');
         starInfoPanel.classList.add('hidden');
 
-        // Reset camera and controls
         gsap.to(camera.position, {
             x: 0, y: 300, z: 600,
             duration: 3,
@@ -447,52 +421,23 @@ function enableDeepSpaceZoom() {
     // --- Professional Star Catalog Dropdown (Right Side) ---
     const starMenuContainer = document.createElement('div');
     starMenuContainer.id = 'star-catalog-container';
-    starMenuContainer.style.cssText = `
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-    `;
     document.body.appendChild(starMenuContainer);
 
     // Dropdown Toggle Button
     const catalogToggle = document.createElement('button');
     catalogToggle.className = 'control-btn';
-    catalogToggle.style.cssText = `
-        position: relative;
-        left: 0;
-        transform: none;
-        margin: 0;
-        width: 160px;
-        background: rgba(0, 40, 80, 0.9);
-        border: 1px solid #00ffff;
-        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
-    `;
     catalogToggle.innerHTML = '📂 Star Catalog ▾';
     starMenuContainer.appendChild(catalogToggle);
 
     // Star List (Hidden by default)
     const starList = document.createElement('div');
     starList.id = 'star-list';
-    starList.style.cssText = `
-        display: none;
-        flex-direction: column;
-        gap: 5px;
-        margin-top: 10px;
-        max-height: 50vh;
-        overflow-y: auto;
-        padding-right: 5px;
-        align-items: flex-end;
-    `;
     starMenuContainer.appendChild(starList);
 
     // Toggle Logic
     catalogToggle.onclick = (e) => {
         e.stopPropagation();
-        const isHidden = starList.style.display === 'none';
+        const isHidden = starList.style.display === 'none' || starList.style.display === '';
         starList.style.display = isHidden ? 'flex' : 'none';
         catalogToggle.innerHTML = isHidden ? '📂 Star Catalog ▴' : '📂 Star Catalog ▾';
     };
@@ -509,16 +454,15 @@ function enableDeepSpaceZoom() {
     starsToMenu.forEach(s => {
         const btn = document.createElement('button');
         btn.className = 'control-btn';
-        btn.style.cssText = `
-            position: relative;
-            left: 0;
-            transform: none;
-            margin: 0;
-            width: 140px;
-            font-size: 11px;
-            padding: 8px 12px;
-            background: rgba(0, 20, 40, 0.85);
-        `;
+        btn.style.position = 'relative';
+        btn.style.left = '0';
+        btn.style.transform = 'none';
+        btn.style.margin = '0';
+        btn.style.width = '140px';
+        btn.style.fontSize = '11px';
+        btn.style.padding = '8px 12px';
+        btn.style.background = 'rgba(0, 20, 40, 0.85)';
+        
         btn.innerHTML = `⭐ ${s.name}`;
         btn.onclick = (e) => {
             e.stopPropagation();
@@ -532,15 +476,14 @@ function enableDeepSpaceZoom() {
     // Saptrishi Button in List
     const saptrishiBtn = document.createElement('button');
     saptrishiBtn.className = 'control-btn btn-golden';
-    saptrishiBtn.style.cssText = `
-        position: relative;
-        left: 0;
-        transform: none;
-        margin: 0;
-        width: 140px;
-        font-size: 11px;
-        padding: 8px 12px;
-    `;
+    saptrishiBtn.style.position = 'relative';
+    saptrishiBtn.style.left = '0';
+    saptrishiBtn.style.transform = 'none';
+    saptrishiBtn.style.margin = '0';
+    saptrishiBtn.style.width = '140px';
+    saptrishiBtn.style.fontSize = '11px';
+    saptrishiBtn.style.padding = '8px 12px';
+    
     saptrishiBtn.innerHTML = '✨ Saptrishi';
     saptrishiBtn.onclick = (e) => {
         e.stopPropagation();
