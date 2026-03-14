@@ -375,9 +375,9 @@ function createGalaxies() {
 
 // 7. Cinematic Zoom Out Mode
 function enableDeepSpaceZoom() {
-    controls.maxDistance = 5000;
+    controls.maxDistance = 15000; // Match the high-scale limit for extreme deep space zoom
     
-    // Add Cinematic Zoom Button
+    // UI Buttons (Responsive Classes used from style.css)
     const zoomBtn = document.createElement('button');
     zoomBtn.id = 'cinematic-zoom-btn';
     zoomBtn.className = 'control-btn';
@@ -394,14 +394,58 @@ function enableDeepSpaceZoom() {
         });
     };
 
-    // Add Find Saptrishi Button
+    // --- Star Menu System ---
+    const starMenu = document.createElement('div');
+    starMenu.id = 'star-menu';
+    starMenu.style.cssText = `
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 100;
+        max-height: 60vh;
+        overflow-y: auto;
+        padding-right: 10px;
+    `;
+    document.body.appendChild(starMenu);
+
+    const starsToMenu = majorStarsData.filter(s => !s.name.includes('Saptrishi'));
+    const saptrishiStars = majorStarsData.filter(s => s.name.includes('Saptrishi'));
+
+    // Main Stars
+    starsToMenu.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'control-btn';
+        btn.style.cssText = `
+            position: relative;
+            left: 0;
+            transform: none;
+            margin: 0;
+            width: 140px;
+            font-size: 11px;
+            padding: 8px 12px;
+        `;
+        btn.innerHTML = `⭐ ${s.name}`;
+        btn.onclick = () => focusOnStar(s);
+        starMenu.appendChild(btn);
+    });
+
+    // Saptrishi Menu Toggle
     const saptrishiBtn = document.createElement('button');
     saptrishiBtn.id = 'find-saptrishi-btn';
     saptrishiBtn.className = 'control-btn btn-golden';
-    saptrishiBtn.innerHTML = '✨ Locate Saptrishi';
-    saptrishiBtn.style.bottom = '80px';
-    document.body.appendChild(saptrishiBtn);
-
+    saptrishiBtn.style.cssText = `
+        position: relative;
+        left: 0;
+        transform: none;
+        margin: 0;
+        width: 140px;
+        font-size: 11px;
+        padding: 8px 12px;
+    `;
+    saptrishiBtn.innerHTML = '✨ Saptrishi Group';
     saptrishiBtn.onclick = () => {
         gsap.to(camera.position, {
             x: -500, y: 1800, z: 800,
@@ -413,9 +457,33 @@ function enableDeepSpaceZoom() {
             }
         });
     };
+    starMenu.appendChild(saptrishiBtn);
 
-    // Listen for zoom changes to show/hide layers
-    // Moved to updateExtensions() for smoother updates
+    function focusOnStar(s) {
+        const targetPos = new THREE.Vector3(...s.pos);
+        const camOffset = targetPos.clone().normalize().multiplyScalar(100);
+        const camPos = targetPos.clone().add(camOffset);
+
+        gsap.to(camera.position, {
+            x: camPos.x, y: camPos.y, z: camPos.z,
+            duration: 3,
+            ease: "power2.inOut",
+            onUpdate: () => {
+                controls.target.copy(targetPos);
+                controls.update();
+            }
+        });
+
+        // Show Info
+        starInfoPanel.innerHTML = `
+            <h3 style="margin-top:0">${s.name}</h3>
+            <p>Distance: ${s.dist}</p>
+            <p>Type: ${s.type}</p>
+            <p>Size: ${s.size}</p>
+        `;
+        starInfoPanel.classList.remove('hidden');
+        setTimeout(() => starInfoPanel.classList.add('hidden'), 8000);
+    }
 }
 
 // Update loop for extensions
