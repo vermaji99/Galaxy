@@ -394,27 +394,68 @@ function enableDeepSpaceZoom() {
         });
     };
 
-    // --- Star Menu System ---
-    const starMenu = document.createElement('div');
-    starMenu.id = 'star-menu';
-    starMenu.style.cssText = `
+    // --- Professional Star Catalog Dropdown (Right Side) ---
+    const starMenuContainer = document.createElement('div');
+    starMenuContainer.id = 'star-catalog-container';
+    starMenuContainer.style.cssText = `
         position: absolute;
         top: 20px;
-        left: 20px;
+        right: 20px;
+        z-index: 1000;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        z-index: 100;
-        max-height: 60vh;
-        overflow-y: auto;
-        padding-right: 10px;
+        align-items: flex-end;
     `;
-    document.body.appendChild(starMenu);
+    document.body.appendChild(starMenuContainer);
+
+    // Dropdown Toggle Button
+    const catalogToggle = document.createElement('button');
+    catalogToggle.className = 'control-btn';
+    catalogToggle.style.cssText = `
+        position: relative;
+        left: 0;
+        transform: none;
+        margin: 0;
+        width: 160px;
+        background: rgba(0, 40, 80, 0.9);
+        border: 1px solid #00ffff;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    `;
+    catalogToggle.innerHTML = '📂 Star Catalog ▾';
+    starMenuContainer.appendChild(catalogToggle);
+
+    // Star List (Hidden by default)
+    const starList = document.createElement('div');
+    starList.id = 'star-list';
+    starList.style.cssText = `
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 10px;
+        max-height: 50vh;
+        overflow-y: auto;
+        padding-right: 5px;
+        align-items: flex-end;
+    `;
+    starMenuContainer.appendChild(starList);
+
+    // Toggle Logic
+    catalogToggle.onclick = (e) => {
+        e.stopPropagation();
+        const isHidden = starList.style.display === 'none';
+        starList.style.display = isHidden ? 'flex' : 'none';
+        catalogToggle.innerHTML = isHidden ? '📂 Star Catalog ▴' : '📂 Star Catalog ▾';
+    };
+
+    // Close dropdown when clicking elsewhere
+    window.addEventListener('click', () => {
+        starList.style.display = 'none';
+        catalogToggle.innerHTML = '📂 Star Catalog ▾';
+    });
 
     const starsToMenu = majorStarsData.filter(s => !s.name.includes('Saptrishi'));
-    const saptrishiStars = majorStarsData.filter(s => s.name.includes('Saptrishi'));
 
-    // Main Stars
+    // Populate List
     starsToMenu.forEach(s => {
         const btn = document.createElement('button');
         btn.className = 'control-btn';
@@ -426,15 +467,20 @@ function enableDeepSpaceZoom() {
             width: 140px;
             font-size: 11px;
             padding: 8px 12px;
+            background: rgba(0, 20, 40, 0.85);
         `;
         btn.innerHTML = `⭐ ${s.name}`;
-        btn.onclick = () => focusOnStar(s);
-        starMenu.appendChild(btn);
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            focusOnStar(s);
+            starList.style.display = 'none';
+            catalogToggle.innerHTML = '📂 Star Catalog ▾';
+        };
+        starList.appendChild(btn);
     });
 
-    // Saptrishi Menu Toggle
+    // Saptrishi Button in List
     const saptrishiBtn = document.createElement('button');
-    saptrishiBtn.id = 'find-saptrishi-btn';
     saptrishiBtn.className = 'control-btn btn-golden';
     saptrishiBtn.style.cssText = `
         position: relative;
@@ -445,8 +491,9 @@ function enableDeepSpaceZoom() {
         font-size: 11px;
         padding: 8px 12px;
     `;
-    saptrishiBtn.innerHTML = '✨ Saptrishi Group';
-    saptrishiBtn.onclick = () => {
+    saptrishiBtn.innerHTML = '✨ Saptrishi';
+    saptrishiBtn.onclick = (e) => {
+        e.stopPropagation();
         gsap.to(camera.position, {
             x: -500, y: 1800, z: 800,
             duration: 3,
@@ -456,8 +503,10 @@ function enableDeepSpaceZoom() {
                 controls.update();
             }
         });
+        starList.style.display = 'none';
+        catalogToggle.innerHTML = '📂 Star Catalog ▾';
     };
-    starMenu.appendChild(saptrishiBtn);
+    starList.appendChild(saptrishiBtn);
 
     function focusOnStar(s) {
         const targetPos = new THREE.Vector3(...s.pos);
