@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vermaji99.github.io/Galaxy/sitemap.xml
+Sitemap: https://galaxy-one-zeta.vercel.app/sitemap.xml

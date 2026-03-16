@@ -41,6 +41,15 @@ body {
     letter-spacing: 2px;
 }
 
+#author-credit {
+    font-size: 0.8rem;
+    margin: 5px 0 0 0;
+    color: var(--accent-color);
+    opacity: 0.8;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+}
+
 #hint {
     font-size: 0.9rem;
     opacity: 0.7;
